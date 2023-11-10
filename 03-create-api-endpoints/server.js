@@ -54,7 +54,9 @@ const server = http.createServer((req, res) => {
     // GET /dogs
     if (req.method === 'GET' && req.url === '/dogs') {
       // Your code here
-
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.write(JSON.stringify(dogs));
       return res.end();
     }
 
@@ -64,6 +66,16 @@ const server = http.createServer((req, res) => {
       if (urlParts.length === 3) {
         const dogId = urlParts[2];
         // Your code here
+        let desiredDog = dogs.find(dog => dog.dogId === Number(dogId));
+        if (desiredDog) {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.write(JSON.stringify(desiredDog));
+        } else {
+          res.statusCode = 404;
+          res.setHeader('Content-Type', 'application/json');
+          res.write(JSON.stringify({message: 'Dog Doesnt Exist'}));
+        }
       }
       return res.end();
     }
@@ -72,6 +84,16 @@ const server = http.createServer((req, res) => {
     if (req.method === 'POST' && req.url === '/dogs') {
       const { name, age } = req.body;
       // Your code here
+      const newDogId = getNewDogId();
+      const newDog = {
+        dogId: newDogId,
+        name, age
+      };
+      dogs.push(newDog);
+
+      res.statusCode = 201;
+      res.setHeader('Content-Type', 'application/json');
+      res.write(JSON.stringify(newDog));
       return res.end();
     }
 
@@ -81,6 +103,20 @@ const server = http.createServer((req, res) => {
       if (urlParts.length === 3) {
         const dogId = urlParts[2];
         // Your code here
+        let desiredDog = dogs.find(dog => dog.dogId === Number(dogId));
+        if (desiredDog) {
+          const {name, age} = req.body
+          desiredDog.name = name;
+          desiredDog.age = age;
+
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.write(JSON.stringify(desiredDog))
+        } else {
+          res.statusCode = 404;
+          res.setHeader('Content-Type', 'application/json');
+          res.write(JSON.stringify({message: 'Dog Doesnt Exist'}));
+        }
       }
       return res.end();
     }
@@ -91,6 +127,14 @@ const server = http.createServer((req, res) => {
       if (urlParts.length === 3) {
         const dogId = urlParts[2];
         // Your code here
+        let desiredDog = dogs.find((dog) => dog.dogId === Number(dogId));
+        let idx = dogs.findIndex(dog => dog == desiredDog);
+
+        dogs.splice(idx, 1);
+
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json')
+        res.write(JSON.stringify({message: 'Successfully deleted'}));
       }
       return res.end();
     }
